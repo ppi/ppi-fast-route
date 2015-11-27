@@ -6,7 +6,7 @@
     "autoload": {
         "psr-4": {
             "PPI\\FastRoute\\": "src/",
-            "PPI\\FastRoute\\": "tests/"
+            "PPI\\FastRouteTest\\": "tests/"
         }
     }
 }
