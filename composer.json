@@ -8,5 +8,5 @@
             "PPI\\FastRoute\\": "src/",
             "PPI\\FastRoute\\": "tests/"
         }
-    },
+    }
 }
