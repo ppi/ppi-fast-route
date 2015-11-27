@@ -17,9 +17,25 @@ class FastRouteWrapper implements UrlGeneratorInterface, RequestMatcherInterface
      */
     protected $requestContext;
 
+    /**
+     * @var RouteCollector
+     */
     protected $routeCollector;
+
+    /**
+     * @var DataGenerator
+     */
     protected $dataGenerator;
+
+    /**
+     * @var Dispatcher
+     */
     protected $dispatcher;
+
+    /**
+     * @var string
+     */
+    protected $moduleName;
 
     /**
      * @param RouteCollector $routeCollector
@@ -100,7 +116,7 @@ class FastRouteWrapper implements UrlGeneratorInterface, RequestMatcherInterface
         // The included file must return the laravel router
         include $path;
 
-        if(!($router instanceof RouteCollector)) {
+        if(!($r instanceof RouteCollector)) {
             throw new \Exception('Invalid return value from '
                 . pathinfo($path, PATHINFO_FILENAME)
                 . ' expected instance of RouteCollector'
@@ -110,5 +126,20 @@ class FastRouteWrapper implements UrlGeneratorInterface, RequestMatcherInterface
         return $router;
     }
 
+    /**
+     * @return string
+     */
+    public function getModuleName()
+    {
+        return $this->moduleName;
+    }
+
+    /**
+     * @param string $moduleName
+     */
+    public function setModuleName($moduleName)
+    {
+        $this->moduleName = $moduleName;
+    }
 
 }
