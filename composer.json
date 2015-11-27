@@ -1,0 +1,6 @@
+{
+    "name": "ppi/fast-route"
+    "require": {
+        "nikic/fast-route": "^0.6.0"
+    }
+}
