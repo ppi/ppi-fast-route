@@ -8,6 +8,8 @@ use Symfony\Component\Routing\RequestContext as SymfonyRequestContext;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class FastRouteWrapper implements UrlGeneratorInterface, RequestMatcherInterface
 {
@@ -77,24 +79,27 @@ class FastRouteWrapper implements UrlGeneratorInterface, RequestMatcherInterface
 
     public function matchRequest(SymfonyRequest $request)
     {
-        $result = $this->dispatcher->dispatch($method, $path);
+        $method = $request->getMethod();
+        $path = $request->getPathInfo();
 
-        switch ($result[0]) {
-            case Dispatcher::NOT_FOUND:
-                // @todo - handle found not route
-                // ... 404 Not Found
-                break;
+        $routeInfo = $this->dispatcher->dispatch($method, $path);
+        switch ($routeInfo[0]) {
             case Dispatcher::METHOD_NOT_ALLOWED:
-                // @todo - handle method not allowed
-                $allowedMethods = $routeInfo[1];
-                // ... 405 Method Not Allowed
-                break;
+//                $allowedMethods = $routeInfo[1];
+                throw new MethodNotAllowedException;
+
             case Dispatcher::FOUND:
-                // @todo - handle found route
-                $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
-                // ... call $handler with $vars
-                break;
+                $vars['_route'] = $method . ' ' . $path;
+                $vars['_controller'] = $routeInfo[1];
+                $vars['_module'] = $this->getModuleName();
+                return $vars;
+
+            case Dispatcher::NOT_FOUND:
+                throw new ResourceNotFoundException;
+
+            default:
+                throw new ResourceNotFoundException;
         }
     }
 
@@ -103,28 +108,7 @@ class FastRouteWrapper implements UrlGeneratorInterface, RequestMatcherInterface
      * @return LaravelRouter
      * @throws \Exception
      */
-    public function load($path)
-    {
 
-        if(!is_readable($path)) {
-            throw new \InvalidArgumentException('Invalid fast route routes path found: ' . $path);
-        }
-
-        // localising the object so the $path file can reference $router;
-        $r = $this->routeCollector;
-
-        // The included file must return the laravel router
-        include $path;
-
-        if(!($r instanceof RouteCollector)) {
-            throw new \Exception('Invalid return value from '
-                . pathinfo($path, PATHINFO_FILENAME)
-                . ' expected instance of RouteCollector'
-            );
-        }
-
-        return $router;
-    }
 
     /**
      * @return string
