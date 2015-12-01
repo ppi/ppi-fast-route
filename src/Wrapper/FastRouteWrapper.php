@@ -20,16 +20,6 @@ class FastRouteWrapper implements UrlGeneratorInterface, RequestMatcherInterface
     protected $requestContext;
 
     /**
-     * @var RouteCollector
-     */
-    protected $routeCollector;
-
-    /**
-     * @var DataGenerator
-     */
-    protected $dataGenerator;
-
-    /**
      * @var Dispatcher
      */
     protected $dispatcher;
@@ -40,14 +30,10 @@ class FastRouteWrapper implements UrlGeneratorInterface, RequestMatcherInterface
     protected $moduleName;
 
     /**
-     * @param RouteCollector $routeCollector
-     * @param DataGenerator $dataGenerator
      * @param Dispatcher $dispatcher
      */
-    public function __construct(RouteCollector $routeCollector, DataGenerator $dataGenerator, Dispatcher $dispatcher)
+    public function __construct(Dispatcher $dispatcher)
     {
-        $this->routeCollector = $routeCollector;
-        $this->dataGenerator = $dataGenerator;
         $this->dispatcher = $dispatcher;
     }
 
@@ -81,8 +67,8 @@ class FastRouteWrapper implements UrlGeneratorInterface, RequestMatcherInterface
     {
         $method = $request->getMethod();
         $path = $request->getPathInfo();
-
         $routeInfo = $this->dispatcher->dispatch($method, $path);
+
         switch ($routeInfo[0]) {
             case Dispatcher::METHOD_NOT_ALLOWED:
 //                $allowedMethods = $routeInfo[1];
